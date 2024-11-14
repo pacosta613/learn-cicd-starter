@@ -20,8 +20,8 @@ func TestGetAPIKey(t *testing.T) {
 	}
 
 	// Test case 2: Missing Authorization header
-	headers = http.Header{}
-	apiKey, err = GetAPIKey(headers)
+	headers = http.Header{}          // Reset headers with no Authorization
+	apiKey, err = GetAPIKey(headers) // Call function with missing header
 	if err != ErrNoAuthHeaderIncluded {
 		t.Fatalf("expected error %v, got %v", ErrNoAuthHeaderIncluded, err)
 	}
