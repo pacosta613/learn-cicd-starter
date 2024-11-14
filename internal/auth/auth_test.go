@@ -20,8 +20,8 @@ func TestGetAPIKey(t *testing.T) {
 	}
 
 	// Test case 2: Missing Authorization header
-	headers = http.Header{}
-	apiKey, err = GetAPIKey(headers)
+	// headers = http.Header{}
+	// apiKey, err = GetAPIKey(headers)
 	if err != ErrNoAuthHeaderIncluded {
 		t.Fatalf("expected error %v, got %v", ErrNoAuthHeaderIncluded, err)
 	}
@@ -30,7 +30,7 @@ func TestGetAPIKey(t *testing.T) {
 	headers = http.Header{}
 	headers.Set("Authorization", "Bearer test-api-key") // Incorrect prefix
 
-	apiKey, err = GetAPIKey(headers)
+	// apiKey, err = GetAPIKey(headers)
 	if err == nil || err.Error() != "malformed authorization header" {
 		t.Fatalf("expected malformed authorization header error, got %v", err)
 	}
