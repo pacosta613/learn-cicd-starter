@@ -1,23 +1,37 @@
 package auth
 
 import (
-	"os"
+	"net/http"
 	"testing"
 )
 
 func TestGetAPIKey(t *testing.T) {
-	// Set up environment variable for testing, if GetAPIKey relies on one
-	os.Setenv("API_KEY", "test-api-key")
-	defer os.Unsetenv("API_KEY") // clean up after the test
+	// Test case 1: Proper Authorization header
+	headers := http.Header{}
+	headers.Set("Authorization", "ApiKey test-api-key")
 
-	// Call the function
-	apiKey := GetAPIKey()
-
-	// Define the expected result
+	apiKey, err := GetAPIKey(headers)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
 	expectedAPIKey := "test-api-key"
-
-	// Check if the result is what we expect
 	if apiKey != expectedAPIKey {
-		t.Errorf("GetAPIKey() = %v; want %v", apiKey, expectedAPIKey)
+		t.Errorf("expected %v, got %v", expectedAPIKey, apiKey)
+	}
+
+	// Test case 2: Missing Authorization header
+	headers = http.Header{}
+	apiKey, err = GetAPIKey(headers)
+	if err != ErrNoAuthHeaderIncluded {
+		t.Fatalf("expected error %v, got %v", ErrNoAuthHeaderIncluded, err)
+	}
+
+	// Test case 3: Malformed Authorization header
+	headers = http.Header{}
+	headers.Set("Authorization", "Bearer test-api-key") // Incorrect prefix
+
+	apiKey, err = GetAPIKey(headers)
+	if err == nil || err.Error() != "malformed authorization header" {
+		t.Fatalf("expected malformed authorization header error, got %v", err)
 	}
 }
