@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install gosec
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
       - name: Check out code
         uses: actions/checkout@v4
 
