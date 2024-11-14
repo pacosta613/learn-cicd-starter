@@ -1,6 +1,6 @@
 # learn-cicd-starter (Notely) 
 
-![code coverage badge](https://github.com/pacosta613/learn-cicd-starter/actions/workflows/coverage.yml/badge.svg)
+![code coverage badge](https://github.com/pacosta613/learn-cicd-starter/actions/workflows/ci.yml/badge.svg)
 
 ## Local Development
 
