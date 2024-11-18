@@ -10,13 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Check out the code
       - name: Check out code
         uses: actions/checkout@v4
 
+      # 2. Set up Go
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.0'
 
+      # 3. Build the app
       - name: Build the app
         run: ./scripts/buildprod.sh
+
+      # 4. Authenticate with Google Cloud
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      # 5. Set up gcloud CLI
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: firm-region-405318
+
+      # 6. Build and push Docker image to Artifact Registry
+      - name: Build and push Docker image
+        run: |
+          gcloud builds submit --tag us-central1-docker.pkg.dev/firm-region-405318/notely-ar-repo/notely:latest .
