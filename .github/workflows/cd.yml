@@ -8,7 +8,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       # 1. Check out the code
       - name: Check out code
@@ -36,11 +37,16 @@ jobs:
         with:
           project_id: firm-region-405318
 
-      # 6. Build and push Docker image to Artifact Registry
+      # 6. Run database migrations
+      - name: Run database migrations
+        run: ./scripts/migrateup.sh
+
+      # 7. Build and push Docker image to Artifact Registry
       - name: Build and push Docker image
         run: |
           gcloud builds submit --tag us-central1-docker.pkg.dev/firm-region-405318/notely-ar-repo/notely:latest .
-      # 7. Deploy the app to Cloud Run
+
+      # 8. Deploy the app to Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy notely \
@@ -49,3 +55,8 @@ jobs:
             --allow-unauthenticated \
             --project firm-region-405318 \
             --max-instances=4
+
+      # 9. Check for sensitive credentials
+      - name: Check for sensitive credentials
+        run: |
+          git diff HEAD | grep "DATABASE_URL" || echo "No sensitive credentials found"
