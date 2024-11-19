@@ -25,32 +25,36 @@ jobs:
       - name: Install goose
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
 
-      # 4. Build the app
+      # 4. Debug DATABASE_URL
+      - name: Debug DATABASE_URL
+        run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+
+      # 5. Build the app
       - name: Build the app
         run: ./scripts/buildprod.sh
 
-      # 5. Authenticate with Google Cloud
+      # 6. Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # 6. Set up gcloud CLI
+      # 7. Set up gcloud CLI
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: firm-region-405318
 
-      # 7. Run database migrations
+      # 8. Run database migrations
       - name: Run database migrations
         run: ./scripts/migrateup.sh
 
-      # 8. Build and push Docker image to Artifact Registry
+      # 9. Build and push Docker image to Artifact Registry
       - name: Build and push Docker image
         run: |
           gcloud builds submit --tag us-central1-docker.pkg.dev/firm-region-405318/notely-ar-repo/notely:latest .
 
-      # 9. Deploy the app to Cloud Run
+      # 10. Deploy the app to Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy notely \
@@ -60,7 +64,7 @@ jobs:
             --project firm-region-405318 \
             --max-instances=4
 
-      # 10. Check for sensitive credentials
+      # 11. Check for sensitive credentials
       - name: Check for sensitive credentials
         run: |
           git diff HEAD | grep "DATABASE_URL" || echo "No sensitive credentials found"
